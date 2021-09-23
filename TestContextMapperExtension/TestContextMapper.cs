@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace TestContextMapperExtension
@@ -19,8 +21,8 @@ namespace TestContextMapperExtension
             var objectProperties = objectToMap.GetType().GetProperties();
             foreach (var property in objectProperties)
             {
-                var propName = MakePropertyNameWithDotNotation(property);
-                if(propName.Equals(propertyName, StringComparison.InvariantCulture))
+                var propName = $"{property.DeclaringType.Name}.{property.Name}";
+                if (propName.Equals(propertyName, StringComparison.InvariantCulture))
                 {
                     property.SetValue(objectToMap, testContextPropertyValue);
                 }
@@ -35,23 +37,38 @@ namespace TestContextMapperExtension
             {
                 objectToMap = (T)Activator.CreateInstance(typeof(T));
             }
-            
-            var objectProperties = objectToMap.GetType().GetProperties();
-            foreach (var property in objectProperties)
+
+            MapPropertyInfosToPropertyName(string.Empty, objectToMap.GetType());
+            foreach (var property in propertyMap)
             {
-                var propName = MakePropertyNameWithDotNotation(property);
-                var testContextPropertyValue = TestContext.Parameters[propName];
+                var testContextPropertyValue = TestContext.Parameters[property.Key];
                 if (testContextPropertyValue != null)
                 {
-                    property.SetValue(objectToMap, testContextPropertyValue);
+                    property.Value.SetValue(objectToMap, testContextPropertyValue);
                 }
             }
             return objectToMap;
         }
 
-        static string MakePropertyNameWithDotNotation(PropertyInfo propertyInfo)
+        static Dictionary<string, PropertyInfo> propertyMap = new Dictionary<string, PropertyInfo>();
+
+        static void MapPropertyInfosToPropertyName(string prefix, Type t)
         {
-            return $"{propertyInfo.DeclaringType.Name}.{propertyInfo.Name}";
+            if (!string.IsNullOrEmpty(prefix) && !prefix.EndsWith(".")) prefix += ".";
+            prefix += t.Name + ".";
+
+            foreach (PropertyInfo propInfo in t.GetProperties().Where(p => p.CanWrite))
+            {
+                Type propertyType = propInfo.PropertyType;
+                if (propertyType.IsPrimitive || propertyType == typeof(string))
+                {
+                    propertyMap.Add(prefix + propInfo.Name, propInfo);
+                }
+                else
+                {
+                    MapPropertyInfosToPropertyName(prefix, propertyType);
+                }
+            }
         }
     }
 }

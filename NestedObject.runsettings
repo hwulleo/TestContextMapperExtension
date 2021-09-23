@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!-- Parameters used by tests at run time -->
+  <TestRunParameters>
+    <Parameter name="NestedObjectBase.FirstProperty" value="First Prop Value" />
+    <Parameter name="NestedObjectBase.SecondProperty" value="Second Prop Value" />
+    <Parameter name="NestedObjectBase.NestedObjectLayerTwo.FirstProperty" value="Nested First Prop Value" />
+    <Parameter name="NestedObjectBase.NestedObjectLayerTwo.SecondProperty" value="Nested Second Prop Value" />
+    <Parameter name="NestedObjectBase.NestedObjectLayerTwo.NestedObjectLayerThree.FirstProperty" value="Double Nested First Prop Value" />
+    <Parameter name="NestedObjectBase.NestedObjectLayerTwo.NestedObjectLayerThree.SecondProperty" value="Double Nested Second Prop Value" />
+  </TestRunParameters>
+</RunSettings>

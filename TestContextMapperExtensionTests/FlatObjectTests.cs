@@ -3,13 +3,15 @@ using TestContextMapperExtension;
 
 namespace TestContextMapperExtensionTests
 {
+    public class FlatObject
+    {
+        public string FirstProperty { get; set; }
+        public string SecondProperty { get; set; }
+    }
+
     public class FlatObjectTests
     {
-        class FlatObject
-        {
-            public string FirstProperty { get; set; }
-            public string SecondProperty { get; set; }
-        }
+        
 
         [Test]
         public void GivenFlatObject_AndValidPropertyInRunsettings_MapPropertyShouldSetValue()
