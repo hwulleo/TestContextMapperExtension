@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using TestContextMapperExtension.Converters;
 
 namespace TestContextMapperExtension
 {
@@ -16,7 +17,9 @@ namespace TestContextMapperExtension
                 var testContextPropertyValue = TestContext.Parameters[usableProperty.Name];
                 if (testContextPropertyValue != null)
                 {
-                    var convertedValue = TConverter.ChangeType(usableProperty.PropertyInfo.PropertyType, testContextPropertyValue);
+                    var convertedValue = usableProperty.Conversion.Invoke(
+                        usableProperty.PropertyInfo.PropertyType, testContextPropertyValue);
+                    //var convertedValue = TConverter.ChangeType(usableProperty.PropertyInfo.PropertyType, testContextPropertyValue);
                     usableProperty.PropertyInfo.SetValue(usableProperty.ParentObject, convertedValue);
                 }
             }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestContextMapperExtension
+namespace TestContextMapperExtension.Converters
 {
     public static class TConverter
     {

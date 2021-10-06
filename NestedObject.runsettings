@@ -10,6 +10,7 @@
     <Parameter name="FlatObject.BoolProperty" value="true" />
     <Parameter name="FlatObject.NullableBoolProperty" value="true" />
     <Parameter name="FlatObject.NullableStringProperty" value="null" />
+    <Parameter name="FlatObject.RegularEnum" value="FourthEnum" />
     
     <Parameter name="NestedObjectBase.FirstProperty" value="First Prop Value" />
     <Parameter name="NestedObjectBase.SecondProperty" value="Second Prop Value" />

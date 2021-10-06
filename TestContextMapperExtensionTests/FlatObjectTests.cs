@@ -4,16 +4,6 @@ using TestContextMapperExtension;
 
 namespace TestContextMapperExtensionTests
 {
-    public class FlatObject
-    {
-        public string FirstProperty { get; set; }
-        public string SecondProperty { get; set; }
-        public int IntProperty { get; set; }
-        public double DoubleProperty { get; set; }
-        public bool BoolProperty { get; set; }
-        public bool? NullableBoolProperty { get; set; }
-    }
-
     public class FlatObjectTests
     {
         [Test]
@@ -28,5 +18,35 @@ namespace TestContextMapperExtensionTests
             Assert.AreEqual(true, flatObject.BoolProperty);
             Assert.AreEqual(true, flatObject.NullableBoolProperty);
         }
+
+        [Test]
+        public void EnumPropertyInFlatObject_AndValidPropertyInRunsettings_MapPropertiesShouldSetEnumValue()
+        {
+            var flatObject = new FlatObject();
+            TestContext.CurrentContext.MapProperties(ref flatObject);
+
+            var value = (EnumValues)Enum.Parse(typeof(EnumValues), "FourthEnum");
+            Assert.AreEqual(EnumValues.FourthEnum, flatObject.RegularEnum);
+
+        }
+    }
+
+    public class FlatObject
+    {
+        public string FirstProperty { get; set; }
+        public string SecondProperty { get; set; }
+        public int IntProperty { get; set; }
+        public double DoubleProperty { get; set; }
+        public bool BoolProperty { get; set; }
+        public bool? NullableBoolProperty { get; set; }
+        public EnumValues RegularEnum { get; set; }
+    }
+
+    public enum EnumValues
+    {
+        FirstEnum,
+        SecondEnum,
+        ThirdEnum,
+        FourthEnum = 50
     }
 }

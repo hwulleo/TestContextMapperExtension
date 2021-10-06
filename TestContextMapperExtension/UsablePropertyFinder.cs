@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using TestContextMapperExtension.Converters;
+using static TestContextMapperExtension.UsableProperty;
 
 namespace TestContextMapperExtension
 {
@@ -55,7 +57,8 @@ namespace TestContextMapperExtension
                     {
                         Name = prefix + propInfo.Name,
                         ParentObject = objectToMap,
-                        PropertyInfo = propInfo
+                        PropertyInfo = propInfo,
+                        Conversion = GetConversionFunction(propertyType)
                     };
                     usableProperties.Add(usableProperty);
                 }
@@ -76,6 +79,11 @@ namespace TestContextMapperExtension
         {
             //basic "simple" properties that are primitives or strings are easy
             if(propertyType.IsPublic && IsSimpleProperty(propertyType))
+            {
+                return true;
+            }
+
+            if (propertyType.IsPublic && propertyType.IsEnum)
             {
                 return true;
             }
@@ -116,5 +124,23 @@ namespace TestContextMapperExtension
 
             return false;
         }
+
+        public static ConversionFunction GetConversionFunction(Type type)
+        {
+            if(type.IsEnum)
+            {
+                return (t, v) =>
+                {
+                    var enumValue = Enum.Parse(t, v?.ToString());
+                    return enumValue;
+                };
+            }
+            else
+            {
+                return TConverter.ChangeType;
+            }
+        }
+
+         
     }
 }

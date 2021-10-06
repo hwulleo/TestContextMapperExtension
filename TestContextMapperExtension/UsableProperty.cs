@@ -15,5 +15,9 @@ namespace TestContextMapperExtension
 
         public PropertyInfo PropertyInfo { get; set; }
 
+        public delegate object ConversionFunction(Type type, object value);
+
+        public ConversionFunction Conversion { get; set; }
+
     }
 }
