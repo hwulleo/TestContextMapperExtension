@@ -9,7 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestContextMapperExtensionT
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9AB2A462-5BA8-4703-A9D5-5A1D5183FFCF}"
 	ProjectSection(SolutionItems) = preProject
-		FlatObject.runsettings = FlatObject.runsettings
 		NestedObject.runsettings = NestedObject.runsettings
 	EndProjectSection
 EndProject

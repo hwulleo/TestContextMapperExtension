@@ -8,67 +8,19 @@ namespace TestContextMapperExtension
 {
     public static class TestContextMapper
     {
-        public static T MapProperty<T>(this TestContext testContext, ref T objectToMap, string propertyName)
+        public static T MapProperties<T>(this TestContext testContext, ref T objectToMap) where T : class, new()
         {
-            if (objectToMap is null)
+            var usableProperties = UsablePropertyFinder.MakeUseablePropertyList(objectToMap);
+            foreach (var usableProperty in usableProperties)
             {
-                TestContext.Progress.WriteLine($"objectToMap provided to {nameof(MapProperty)} " +
-                    $"is null. Exiting with no map.");
-                return objectToMap;
-            }
-            var testContextPropertyValue = TestContext.Parameters[propertyName];
-
-            var objectProperties = objectToMap.GetType().GetProperties();
-            foreach (var property in objectProperties)
-            {
-                var propName = $"{property.DeclaringType.Name}.{property.Name}";
-                if (propName.Equals(propertyName, StringComparison.InvariantCulture))
-                {
-                    property.SetValue(objectToMap, testContextPropertyValue);
-                }
-            }
-
-            return objectToMap;
-        }
-
-        public static T MapProperties<T>(this TestContext testContext, ref T objectToMap)
-        {
-            if (objectToMap is null)
-            {
-                objectToMap = (T)Activator.CreateInstance(typeof(T));
-            }
-
-            MapPropertyInfosToPropertyName(string.Empty, objectToMap.GetType());
-            foreach (var property in propertyMap)
-            {
-                var testContextPropertyValue = TestContext.Parameters[property.Key];
+                var testContextPropertyValue = TestContext.Parameters[usableProperty.Name];
                 if (testContextPropertyValue != null)
                 {
-                    property.Value.SetValue(objectToMap, testContextPropertyValue);
+                    var convertedValue = TConverter.ChangeType(usableProperty.PropertyInfo.PropertyType, testContextPropertyValue);
+                    usableProperty.PropertyInfo.SetValue(usableProperty.ParentObject, convertedValue);
                 }
             }
             return objectToMap;
-        }
-
-        static Dictionary<string, PropertyInfo> propertyMap = new Dictionary<string, PropertyInfo>();
-
-        static void MapPropertyInfosToPropertyName(string prefix, Type t)
-        {
-            if (!string.IsNullOrEmpty(prefix) && !prefix.EndsWith(".")) prefix += ".";
-            prefix += t.Name + ".";
-
-            foreach (PropertyInfo propInfo in t.GetProperties().Where(p => p.CanWrite))
-            {
-                Type propertyType = propInfo.PropertyType;
-                if (propertyType.IsPrimitive || propertyType == typeof(string))
-                {
-                    propertyMap.Add(prefix + propInfo.Name, propInfo);
-                }
-                else
-                {
-                    MapPropertyInfosToPropertyName(prefix, propertyType);
-                }
-            }
         }
     }
 }
