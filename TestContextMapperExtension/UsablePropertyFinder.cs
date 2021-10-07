@@ -12,6 +12,13 @@ namespace TestContextMapperExtension
 {
     class UsablePropertyFinder
     {
+        /// <summary>
+        /// Make a list of all the properties and nested properties on the object that 
+        /// match those in the .runsettings file can be mapped.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objectToMap"></param>
+        /// <returns></returns>
         public static List<UsableProperty> MakeUseablePropertyList<T>(T objectToMap)
         {
             if(objectToMap is null)
@@ -43,49 +50,59 @@ namespace TestContextMapperExtension
             {
                 return;
             }
-            if(objectToMap is null)
+            if(objectToMap is null && CanCreateInstance(objectToMapType))
             {
                 objectToMap = Activator.CreateInstance(objectToMapType);
             }
 
             foreach (PropertyInfo propInfo in objectToMapType.GetProperties().Where(p => p.CanWrite))
             {
-                Type propertyType = propInfo.PropertyType;
-                if (IsUsableProperty(propertyType))
+                if(propInfo.PropertyType.IsClass && propInfo.PropertyType.GetProperties().Any())
+                {
+                    if (TestContext.Parameters.Names.Any(n => n.Contains(prefix + propInfo.Name)))
+                    {
+                        object propInstance = null;
+                        if (CanCreateInstance(propInfo.PropertyType))
+                        {
+                            propInstance = Activator.CreateInstance(propInfo.PropertyType);
+                            propInfo.SetValue(objectToMap, propInstance);
+                        }
+                        GetUsableProperties(prefix, propInstance, propInfo.PropertyType);
+                    }
+                }
+
+                var usablePropertyType = GetUsablePropertyType(propInfo.PropertyType);
+                if (usablePropertyType != UsablePropertyType.UnusableProperty)
                 {
                     UsableProperty usableProperty = new UsableProperty
                     {
                         Name = prefix + propInfo.Name,
                         ParentObject = objectToMap,
                         PropertyInfo = propInfo,
-                        Conversion = GetConversionFunction(propertyType)
+                        Conversion = GetConversionFunction(propInfo.PropertyType)
                     };
                     usableProperties.Add(usableProperty);
-                }
-                else if(propInfo.PropertyType.GetProperties().Any(t => IsUsableProperty(t.PropertyType)))
-                {
-                    if (TestContext.Parameters.Names.Any(n => n.Contains(prefix + propInfo.Name)))
-                    {
-                        var propInstance = Activator.CreateInstance(propertyType);
-                        propInfo.SetValue(objectToMap, propInstance);
-                        GetUsableProperties(prefix, propInstance, propInfo.PropertyType);
-                    }
-                    
                 }
             }
         }
 
-        static bool IsUsableProperty(Type propertyType)
+        static UsablePropertyType GetUsablePropertyType(Type propertyType)
         {
-            //basic "simple" properties that are primitives or strings are easy
-            if(propertyType.IsPublic && IsSimpleProperty(propertyType))
+            //only public properties matter for this use case
+            if (!propertyType.IsPublic)
             {
-                return true;
+                return UsablePropertyType.UnusableProperty;
             }
 
-            if (propertyType.IsPublic && propertyType.IsEnum)
+            //basic "simple" properties that are primitives or strings are easy
+            if (IsSimpleProperty(propertyType))
             {
-                return true;
+                return UsablePropertyType.Simple;
+            }
+
+            if (propertyType.IsEnum)
+            {
+                return UsablePropertyType.Enum;
             }
 
             //Nullable versions of primitives and strings are easy to convert
@@ -94,19 +111,19 @@ namespace TestContextMapperExtension
                 && propertyType.GetGenericArguments()
                 .Any(t => IsSimpleProperty(t)))
             {
-                return true;
+                return UsablePropertyType.NullableSimple;
             }
-            
+
             //IEnumerable of simple types can be converted
             if (propertyType.IsGenericType
             && propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
             && propertyType.GetGenericTypeDefinition().GetGenericArguments()
             .All(t => IsSimpleProperty(t)))
             {
-                return true;
+                return UsablePropertyType.IEnumerable;
             }
-                
-            return false;
+
+            return UsablePropertyType.UnusableProperty;
         }
 
         /// <summary>
@@ -123,6 +140,17 @@ namespace TestContextMapperExtension
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// check to see if type has a public parameterless (or only optional parameter) constructor
+        /// </summary>
+        /// <param name="propertyType"></param>
+        /// <returns></returns>
+        internal static bool CanCreateInstance(Type propertyType)
+        {
+            return propertyType.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+                .Any(x => x.GetParameters().All(x => x.IsOptional));
         }
 
         public static ConversionFunction GetConversionFunction(Type type)

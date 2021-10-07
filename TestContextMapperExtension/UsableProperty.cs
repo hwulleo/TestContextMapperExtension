@@ -15,9 +15,22 @@ namespace TestContextMapperExtension
 
         public PropertyInfo PropertyInfo { get; set; }
 
+        public UsablePropertyType UsablePropertyType { get; set; }
+
         public delegate object ConversionFunction(Type type, object value);
 
         public ConversionFunction Conversion { get; set; }
+    }
 
+    public enum UsablePropertyType
+    {
+        Simple,
+        NullableSimple,
+        Enum,
+        NullableEnum,
+        IEnumerable,
+        NullableIEnumerable,
+        KeyValuePairStringString,
+        UnusableProperty
     }
 }
