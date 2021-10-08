@@ -14,5 +14,14 @@ namespace TestContextMapperExtension.Converters
             var enumValue = Enum.Parse(type, value?.ToString());
             return enumValue;
         }
+
+        public static object ConvertToNullableEnum(Type type, object value)
+        {
+            Type? nullableType = Nullable.GetUnderlyingType(type);
+            //if ( /*not a nullable type*/nullableType is null)
+              //  throw new ArgumentException($"Provided type {typeof(TEnum).Name} must be either an enum or a nullable enum");
+
+            return Enum.Parse(nullableType, value?.ToString());
+        }
     }
 }

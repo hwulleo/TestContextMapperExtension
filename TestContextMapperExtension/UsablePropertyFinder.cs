@@ -25,25 +25,13 @@ namespace TestContextMapperExtension
             {
                 objectToMap = (T)Activator.CreateInstance(typeof(T));
             }
-            GetUsableProperties(string.Empty, objectToMap, typeof(T));
+            GetUsableProperties(typeof(T).Name + ".", objectToMap, typeof(T));
             return usableProperties;
         }
 
         static List<UsableProperty> usableProperties = new List<UsableProperty>();
         static void GetUsableProperties(string prefix, object objectToMap, Type objectToMapType)
         {
-            if(objectToMapType is null)
-            {
-                TestContext.Progress.WriteLine($"Unknown type for property in class {prefix}");
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(prefix) && !prefix.EndsWith(".")) 
-            {
-                prefix += ".";
-            }  
-            prefix += objectToMapType.Name + ".";
-
             //some configuration objects cause problems if instantiated with no properties assigned
             //better to return early than instantiate one
             if(!TestContext.Parameters.Names.Any(n => n.Contains(prefix)))
@@ -57,18 +45,15 @@ namespace TestContextMapperExtension
 
             foreach (PropertyInfo propInfo in objectToMapType.GetProperties().Where(p => p.CanWrite))
             {
-                if(propInfo.PropertyType.IsClass && propInfo.PropertyType.GetProperties().Any())
+                //If the property is a nested object with more potential properties, we need some recursion
+                if(TestContext.Parameters.Names.Any(n => n.Contains(prefix + propInfo.Name))
+                   && propInfo.PropertyType.IsClass 
+                   && propInfo.PropertyType.GetProperties().Any()
+                   && CanCreateInstance(propInfo.PropertyType))
                 {
-                    if (TestContext.Parameters.Names.Any(n => n.Contains(prefix + propInfo.Name)))
-                    {
-                        object propInstance = null;
-                        if (CanCreateInstance(propInfo.PropertyType))
-                        {
-                            propInstance = Activator.CreateInstance(propInfo.PropertyType);
-                            propInfo.SetValue(objectToMap, propInstance);
-                        }
-                        GetUsableProperties(prefix, propInstance, propInfo.PropertyType);
-                    }
+                    var propInstance = Activator.CreateInstance(propInfo.PropertyType);
+                    propInfo.SetValue(objectToMap, propInstance);
+                    GetUsableProperties(prefix + propInfo.Name + ".", propInstance, propInfo.PropertyType);
                 }
 
                 var usablePropertyType = GetUsablePropertyType(propInfo.PropertyType);
@@ -79,7 +64,7 @@ namespace TestContextMapperExtension
                         Name = prefix + propInfo.Name,
                         ParentObject = objectToMap,
                         PropertyInfo = propInfo,
-                        Conversion = GetConversionFunction(propInfo.PropertyType)
+                        Conversion = TestContextMapper.ConversionFunctionMap[usablePropertyType]
                     };
                     usableProperties.Add(usableProperty);
                 }
@@ -94,15 +79,23 @@ namespace TestContextMapperExtension
                 return UsablePropertyType.UnusableProperty;
             }
 
-            //basic "simple" properties that are primitives or strings are easy
+            //basic "simple" properties that are primitives, strings or decimals are usable
             if (IsSimpleProperty(propertyType))
             {
                 return UsablePropertyType.Simple;
             }
 
+            //Enums need their own conversion type but are usable and often included on config objects
             if (propertyType.IsEnum)
             {
                 return UsablePropertyType.Enum;
+            }
+
+            if(propertyType.IsGenericType
+                && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>)
+                && Nullable.GetUnderlyingType(propertyType)?.IsEnum == true)
+            {
+                return UsablePropertyType.NullableEnum;
             }
 
             //Nullable versions of primitives and strings are easy to convert
@@ -127,14 +120,15 @@ namespace TestContextMapperExtension
         }
 
         /// <summary>
-        /// Returns true if property is a primitive or a string (calling that a "simple" property)
+        /// Returns true if property is a primitive, string or decimal (calling that a "simple" property)
         /// </summary>
         /// <param name="propertyType"></param>
         /// <returns></returns>
         internal static bool IsSimpleProperty(Type propertyType)
         {
-            if ((propertyType.IsPrimitive && propertyType.IsValueType) ||
-                propertyType == typeof(string))
+            if ((propertyType.IsPrimitive && propertyType.IsValueType)
+                || propertyType == typeof(string)
+                || propertyType == typeof(decimal))
             {
                 return true;
             }
@@ -152,23 +146,5 @@ namespace TestContextMapperExtension
             return propertyType.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
                 .Any(x => x.GetParameters().All(x => x.IsOptional));
         }
-
-        public static ConversionFunction GetConversionFunction(Type type)
-        {
-            if(type.IsEnum)
-            {
-                return (t, v) =>
-                {
-                    var enumValue = Enum.Parse(t, v?.ToString());
-                    return enumValue;
-                };
-            }
-            else
-            {
-                return TConverter.ChangeType;
-            }
-        }
-
-         
     }
 }

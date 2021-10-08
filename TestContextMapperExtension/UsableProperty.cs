@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TestContextMapperExtension
 {
-    class UsableProperty
+    public class UsableProperty
     {
         public string Name { get; set; }
 
