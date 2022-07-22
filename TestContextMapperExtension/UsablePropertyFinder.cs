@@ -109,9 +109,8 @@ namespace TestContextMapperExtension
 
             //IEnumerable of simple types can be converted
             if (propertyType.IsGenericType
-            && propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-            && propertyType.GetGenericTypeDefinition().GetGenericArguments()
-            .All(t => IsSimpleProperty(t)))
+            && propertyType.GetGenericTypeDefinition().GetInterfaces().Any(i => i.Name.Contains("IEnumerable"))
+            && propertyType.GetGenericArguments().All(t => IsSimpleProperty(t)))
             {
                 return UsablePropertyType.IEnumerable;
             }

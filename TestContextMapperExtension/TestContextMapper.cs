@@ -16,7 +16,8 @@ namespace TestContextMapperExtension
                 { UsablePropertyType.Enum, EnumConverter.ConvertToEnum },
                 { UsablePropertyType.Simple, TConverter.ChangeType },
                 { UsablePropertyType.NullableSimple, TConverter.ChangeType },
-                { UsablePropertyType.NullableEnum, EnumConverter.ConvertToNullableEnum }
+                { UsablePropertyType.NullableEnum, EnumConverter.ConvertToNullableEnum },
+                { UsablePropertyType.IEnumerable, IEnumerableConverter.ConvertToIEnumerable },
             };
         
         public static T MapProperties<T>(this TestContext testContext, ref T objectToMap) where T : class, new()

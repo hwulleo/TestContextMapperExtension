@@ -1,6 +1,12 @@
+using FsCheck;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TestContextMapperExtension;
+using TestContextMapperExtensionTests.TestObjects;
 
 namespace TestContextMapperExtensionTests
 {
@@ -20,6 +26,17 @@ namespace TestContextMapperExtensionTests
         }
 
         [Test]
+        public void GivenNestedObject_WithIEnumerableValue_MapPropertiesShouldSetIEnumerable()
+        {
+            var nestedObject = new NestedObjectBase();
+            TestContext.CurrentContext.MapProperties(ref nestedObject);
+            Assert.AreEqual("firstString", nestedObject.ListOfStringProperty[0]);
+            Assert.AreEqual("secondString", nestedObject.ListOfStringProperty[1]);
+            Assert.AreEqual("firstString", nestedObject.Nested1Object1.ListOfStringProperty[0]);
+            Assert.AreEqual("secondString", nestedObject.Nested1Object1.ListOfStringProperty[1]);
+        }
+
+        [Test]
         public void Get_Some_Nullable_Info()
         {
             FlatObject flatObject = new FlatObject();
@@ -27,27 +44,51 @@ namespace TestContextMapperExtensionTests
             var genericTypeDefinition = nullableBoolType.GetGenericTypeDefinition();
             var genericTypeArguments = genericTypeDefinition.GetGenericArguments()[0];
         }
+
+        [Test]
+        public void Get_Some_IEnumerable_Info()
+        {
+            NestedObjectBase nestedObject = new NestedObjectBase();
+            nestedObject.ListOfStringProperty = new List<string>();
+            var propertyType = nestedObject.ListOfStringProperty.GetType();
+            var isGeneric = propertyType.IsGenericType;
+            var genericTypeDefinition = propertyType.GetGenericTypeDefinition();
+            var interfaces = genericTypeDefinition.GetInterfaces();
+            var maybeIEnumerable = genericTypeDefinition.GetInterfaces().Any(i => i.Name.Contains("IEnumerable"));
+            var isIEnumerable = genericTypeDefinition == typeof(IEnumerable<>);
+            var hasGenericArguments = propertyType.GetGenericArguments();
+            var areSimple = hasGenericArguments.All(t => IsSimpleProperty(t));
+            //if (propertyType.IsGenericType
+            //&& propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+            //&& propertyType.GetGenericTypeDefinition().GetGenericArguments()
+            //.All(t => IsSimpleProperty(t)))
+            //{
+            //    return UsablePropertyType.IEnumerable;
+            //}
+        }
+
+        [Test]
+        public void FsCheck_Example()
+        {
+            var nestedObjectGen = Arb.Generate<NestedObjectBase>();
+            var nestedObjectSamples = nestedObjectGen.Sample(1000, 2);
+            var nestedObjectJsonString = JsonConvert.SerializeObject(nestedObjectSamples, Formatting.Indented);
+            TestContext.WriteLine(nestedObjectJsonString);
+
+        }
+
+        internal static bool IsSimpleProperty(Type propertyType)
+        {
+            if ((propertyType.IsPrimitive && propertyType.IsValueType)
+                || propertyType == typeof(string)
+                || propertyType == typeof(decimal))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 
-    public class NestedObjectBase
-    {
-        public string FirstProperty { get; set; }
-        public string SecondProperty { get; set; }
-        public NestedObjectLayerTwo Nested1Object1 { get; set; }
-        public NestedObjectLayerTwo Nested1Object2 { get; set; }
-    }
-
-    public class NestedObjectLayerTwo
-    {
-        public string FirstProperty { get; set; }
-        public string SecondProperty { get; set; }
-        public NestedObjectLayerThree Nested2Object1 { get; set; }
-        public NestedObjectLayerThree Nested2Object2 { get; set; }
-    }
-
-    public class NestedObjectLayerThree
-    {
-        public string FirstProperty { get; set; }
-        public string SecondProperty { get; set; }
-    }
+    
 }
