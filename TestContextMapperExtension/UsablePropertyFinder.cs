@@ -107,12 +107,21 @@ namespace TestContextMapperExtension
                 return UsablePropertyType.NullableSimple;
             }
 
-            //IEnumerable of simple types can be converted
+            //IDictionary of simple types can be converted
             if (propertyType.IsGenericType
-            && propertyType.GetGenericTypeDefinition().GetInterfaces().Any(i => i.Name.Contains("IEnumerable"))
+            && propertyType.GetGenericTypeDefinition().GetInterfaces().Any(i => i.Name.Contains("IDictionary"))
             && propertyType.GetGenericArguments().All(t => IsSimpleProperty(t)))
             {
-                return UsablePropertyType.IEnumerable;
+                return UsablePropertyType.IDictionary;
+            }
+
+            //IList of simple types can be converted
+            if (propertyType.IsGenericType
+            && propertyType.GetGenericTypeDefinition().GetInterfaces().Any(i => i.Name.Contains("IList"))
+            && propertyType != typeof(Array)
+            && propertyType.GetGenericArguments().All(t => IsSimpleProperty(t)))
+            {
+                return UsablePropertyType.IList;
             }
 
             return UsablePropertyType.UnusableProperty;

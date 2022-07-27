@@ -21,8 +21,10 @@
     <Parameter name="NestedObjectBase.FirstProperty" value="First Prop Value" />
     <Parameter name="NestedObjectBase.SecondProperty" value="Second Prop Value" />
     <Parameter name="NestedObjectBase.ListOfStringProperty" value="[firstString, secondString]" />
+    <Parameter name="NestedObjectBase.DictionaryOfStringStringProperty" value="{ {dictKey, dictValue}, {dictKey2, dictValue2} }" />
     <Parameter name="NestedObjectBase.Nested1Object1.FirstProperty" value="Nested1Object1 First Prop Value" />
     <Parameter name="NestedObjectBase.Nested1Object1.ListOfStringProperty" value="[firstString, secondString]" />
+    <Parameter name="NestedObjectBase.Nested1Object1.DictionaryOfStringStringProperty" value="{{nestedDictKey,nestedDictValue},{nestedDictKey2,nestedDictValue2}}" />
     <Parameter name="NestedObjectBase.Nested1Object2.FirstProperty" value="Nested1Object2 First Prop Value" />
     <Parameter name="NestedObjectBase.Nested1Object1.SecondProperty" value="Nested1Object1 Second Prop Value" />
     <Parameter name="NestedObjectBase.Nested1Object2.SecondProperty" value="Nested1Object2 Second Prop Value" />

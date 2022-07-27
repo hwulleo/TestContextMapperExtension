@@ -11,6 +11,7 @@ namespace TestContextMapperExtensionTests.TestObjects
         public string FirstProperty { get; set; }
         public string SecondProperty { get; set; }
         public List<string> ListOfStringProperty { get; set; }
+        public Dictionary<string, string> DictionaryOfStringStringProperty { get; set; }
         public NestedObjectLayerTwo Nested1Object1 { get; set; }
         public NestedObjectLayerTwo Nested1Object2 { get; set; }
     }
@@ -20,6 +21,7 @@ namespace TestContextMapperExtensionTests.TestObjects
         public string FirstProperty { get; set; }
         public string SecondProperty { get; set; }
         public List<string> ListOfStringProperty { get; set; }
+        public Dictionary<string, string> DictionaryOfStringStringProperty { get; set; }
         public NestedObjectLayerThree Nested2Object1 { get; set; }
         public NestedObjectLayerThree Nested2Object2 { get; set; }
     }

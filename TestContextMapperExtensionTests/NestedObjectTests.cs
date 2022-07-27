@@ -37,6 +37,18 @@ namespace TestContextMapperExtensionTests
         }
 
         [Test]
+        public void GivenNestedObject_WithIDictionaryValue_MapPropertiesShouldSetIDictionary()
+        {
+            
+            var nestedObject = new NestedObjectBase();
+            TestContext.CurrentContext.MapProperties(ref nestedObject);
+            Assert.AreEqual("dictValue", nestedObject.DictionaryOfStringStringProperty["dictKey"]);
+            Assert.AreEqual("dictValue2", nestedObject.DictionaryOfStringStringProperty["dictKey2"]);
+            Assert.AreEqual("nestedDictValue", nestedObject.Nested1Object1.DictionaryOfStringStringProperty["nestedDictKey"]);
+            Assert.AreEqual("nestedDictValue2", nestedObject.Nested1Object1.DictionaryOfStringStringProperty["nestedDictKey2"]);
+        }
+
+        [Test]
         public void Get_Some_Nullable_Info()
         {
             FlatObject flatObject = new FlatObject();
@@ -58,13 +70,20 @@ namespace TestContextMapperExtensionTests
             var isIEnumerable = genericTypeDefinition == typeof(IEnumerable<>);
             var hasGenericArguments = propertyType.GetGenericArguments();
             var areSimple = hasGenericArguments.All(t => IsSimpleProperty(t));
-            //if (propertyType.IsGenericType
-            //&& propertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-            //&& propertyType.GetGenericTypeDefinition().GetGenericArguments()
-            //.All(t => IsSimpleProperty(t)))
-            //{
-            //    return UsablePropertyType.IEnumerable;
-            //}
+        }
+
+        [Test]
+        public void Get_Some_IDictionary_Info()
+        {
+            NestedObjectBase nestedObject = new NestedObjectBase();
+            nestedObject.DictionaryOfStringStringProperty = new();
+            var propertyType = nestedObject.DictionaryOfStringStringProperty.GetType();
+            var isGeneric = propertyType.IsGenericType;
+            var genericTypeDefinition = propertyType.GetGenericTypeDefinition();
+            var interfaces = genericTypeDefinition.GetInterfaces();
+            var maybeIDict = genericTypeDefinition.GetInterfaces().Any(i => i.Name.Contains("IDictionary"));
+            var hasGenericArguments = propertyType.GetGenericArguments();
+            var areSimple = hasGenericArguments.All(t => IsSimpleProperty(t));
         }
 
         [Test]
