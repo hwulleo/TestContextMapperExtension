@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!-- Parameters used by tests at run time -->
+  <TestRunParameters>
+
+    <Parameter name="FlatObject.FirstProperty" value="First Prop Value" />
+    <Parameter name="FlatObject.SecondProperty" value="Second Prop Value" />
+    <Parameter name="FlatObject.BoolProperty" value="true" />
+    <Parameter name="FlatObject.IntProperty" value="1" />
+    <Parameter name="FlatObject.DoubleProperty" value="2.0" />
+    <Parameter name="FlatObject.DecimalProperty" value="3.0" />
+
+    <Parameter name="FlatObject.NullableStringProperty" value="Nullable string value" />
+    <Parameter name="FlatObject.NullableBoolProperty" value="true" />
+    <Parameter name="FlatObject.NullableIntProperty" value="2" />
+    <Parameter name="FlatObject.NullableDoubleProperty" value="2.33" />
+    <Parameter name="FlatObject.NullableDecimalProperty" value="3.33333" />
+    <Parameter name="FlatObject.RegularEnum" value="FourthEnum" />
+    <Parameter name="FlatObject.NullableEnum" value="SecondEnum" />
+    
+    <Parameter name="NestedObjectBase.FirstProperty" value="First Prop Value" />
+    <Parameter name="NestedObjectBase.SecondProperty" value="Second Prop Value" />
+    <Parameter name="NestedObjectBase.ListOfStringProperty" value="[firstString, secondString]" />
+    <Parameter name="NestedObjectBase.DictionaryOfStringStringProperty" value="{ {dictKey, dictValue}, {dictKey2, dictValue2} }" />
+    <Parameter name="NestedObjectBase.Nested1Object1.FirstProperty" value="Nested1Object1 First Prop Value" />
+    <Parameter name="NestedObjectBase.Nested1Object1.ListOfStringProperty" value="[firstString, secondString]" />
+    <Parameter name="NestedObjectBase.Nested1Object1.DictionaryOfStringStringProperty" value="{{nestedDictKey,nestedDictValue},{nestedDictKey2,nestedDictValue2}}" />
+    <Parameter name="NestedObjectBase.Nested1Object2.FirstProperty" value="Nested1Object2 First Prop Value" />
+    <Parameter name="NestedObjectBase.Nested1Object1.SecondProperty" value="Nested1Object1 Second Prop Value" />
+    <Parameter name="NestedObjectBase.Nested1Object2.SecondProperty" value="Nested1Object2 Second Prop Value" />
+    <Parameter name="NestedObjectBase.Nested1Object1.Nested2Object1.FirstProperty" value="Double Nested First Prop Value" />
+    <Parameter name="NestedObjectBase.Nested1Object1.Nested2Object1.SecondProperty" value="Double Nested Second Prop Value" />
+    
+  </TestRunParameters>
+</RunSettings>
