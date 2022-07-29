@@ -124,6 +124,7 @@ namespace TestContextMapperExtension
                 return UsablePropertyType.IList;
             }
 
+            //If the type is explicitly of just IEnumerable
             if (propertyType.IsGenericType
             && propertyType.GetGenericTypeDefinition().GetInterfaces().Any(i => i.Name.Contains("IEnumerable"))
             && propertyType.GetGenericTypeDefinition().GetInterfaces().Count() == 1

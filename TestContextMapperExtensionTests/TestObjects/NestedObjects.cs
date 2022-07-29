@@ -12,6 +12,7 @@ namespace TestContextMapperExtensionTests.TestObjects
         public string SecondProperty { get; set; }
         public List<string> ListOfStringProperty { get; set; }
         public IEnumerable<string> IEnumerableOfStringProperty { get; set; }
+        public IEnumerable<string>? NullableIEnumerableOfStringProperty { get; set; }
         public Dictionary<string, string> DictionaryOfStringStringProperty { get; set; }
         public NestedObjectLayerTwo Nested1Object1 { get; set; }
         public NestedObjectLayerTwo Nested1Object2 { get; set; }

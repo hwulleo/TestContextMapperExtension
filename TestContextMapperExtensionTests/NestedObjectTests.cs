@@ -48,6 +48,15 @@ namespace TestContextMapperExtensionTests
         }
 
         [Test]
+        public void GivenNestedObject_WithNullableIEnumerableOfStringValue_MapPropertiesShouldSetNullableIEnumerable()
+        {
+            var nestedObject = new NestedObjectBase();
+            TestContext.CurrentContext.MapProperties(ref nestedObject);
+            Assert.AreEqual("firstString", nestedObject.NullableIEnumerableOfStringProperty.First());
+            Assert.AreEqual("secondString", nestedObject.NullableIEnumerableOfStringProperty.Skip(1).First());
+        }
+
+        [Test]
         public void GivenNestedObject_WithIDictionaryValue_MapPropertiesShouldSetIDictionary()
         {
             
@@ -81,6 +90,20 @@ namespace TestContextMapperExtensionTests
             var isIEnumerable = genericTypeDefinition == typeof(IEnumerable<>);
             var hasGenericArguments = propertyType.GetGenericArguments();
             var areSimple = hasGenericArguments.All(t => IsSimpleProperty(t));
+        }
+
+        [Test]
+        public void Get_Some_Nullable_IEnumerable_Info()
+        {
+            NestedObjectBase nestedObject = new NestedObjectBase();
+            var propertyType = nestedObject.GetType().GetProperty("NullableIEnumerableOfStringProperty").PropertyType;
+            var isGeneric = propertyType.IsGenericType;
+
+            var genericTypeDefinition = propertyType.GetGenericTypeDefinition();
+            var interfaces = genericTypeDefinition.GetInterfaces();
+            var genericArguments = propertyType.GetGenericArguments();
+            var nestedGenericArguments = genericArguments.First().GetGenericArguments();
+            var areSimple = nestedGenericArguments.All(t => IsSimpleProperty(t));
         }
 
         [Test]
