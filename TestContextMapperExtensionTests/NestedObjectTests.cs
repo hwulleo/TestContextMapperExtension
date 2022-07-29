@@ -26,7 +26,7 @@ namespace TestContextMapperExtensionTests
         }
 
         [Test]
-        public void GivenNestedObject_WithIEnumerableValue_MapPropertiesShouldSetIEnumerable()
+        public void GivenNestedObject_WithListOfStringValue_MapPropertiesShouldSetIEnumerable()
         {
             var nestedObject = new NestedObjectBase();
             TestContext.CurrentContext.MapProperties(ref nestedObject);
@@ -34,6 +34,17 @@ namespace TestContextMapperExtensionTests
             Assert.AreEqual("secondString", nestedObject.ListOfStringProperty[1]);
             Assert.AreEqual("firstString", nestedObject.Nested1Object1.ListOfStringProperty[0]);
             Assert.AreEqual("secondString", nestedObject.Nested1Object1.ListOfStringProperty[1]);
+        }
+
+        [Test]
+        public void GivenNestedObject_WithIEnumerableOfStringValue_MapPropertiesShouldSetIEnumerable()
+        {
+            var nestedObject = new NestedObjectBase();
+            TestContext.CurrentContext.MapProperties(ref nestedObject);
+            Assert.AreEqual("firstString", nestedObject.IEnumerableOfStringProperty.First());
+            Assert.AreEqual("secondString", nestedObject.IEnumerableOfStringProperty.Skip(1).First());
+            Assert.AreEqual("firstString", nestedObject.Nested1Object1.IEnumerableOfStringProperty.First());
+            Assert.AreEqual("secondString", nestedObject.Nested1Object1.IEnumerableOfStringProperty.Skip(1).First());
         }
 
         [Test]

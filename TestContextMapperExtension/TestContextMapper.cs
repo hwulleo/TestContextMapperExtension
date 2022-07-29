@@ -18,6 +18,7 @@ namespace TestContextMapperExtension
                 { UsablePropertyType.NullableSimple, TConverter.ChangeType },
                 { UsablePropertyType.NullableEnum, EnumConverter.ConvertToNullableEnum },
                 { UsablePropertyType.IList, IListConverter.ConvertToIList },
+                { UsablePropertyType.IEnumerable, IEnumerableConverter.ConvertToIEnumerable },
                 { UsablePropertyType.IDictionary, IDictionaryConverter.ConvertToIDictionary }
             };
         
@@ -29,9 +30,8 @@ namespace TestContextMapperExtension
                 var testContextPropertyValue = TestContext.Parameters[usableProperty.Name];
                 if (testContextPropertyValue != null)
                 {
-                    var convertedValue = usableProperty.Conversion.Invoke(
-                        usableProperty.PropertyInfo.PropertyType, testContextPropertyValue);
-                    //var convertedValue = TConverter.ChangeType(usableProperty.PropertyInfo.PropertyType, testContextPropertyValue);
+                    var convertedValue = usableProperty.Conversion
+                        .Invoke(usableProperty.PropertyInfo.PropertyType, testContextPropertyValue);
                     usableProperty.PropertyInfo.SetValue(usableProperty.ParentObject, convertedValue);
                 }
             }

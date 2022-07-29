@@ -29,6 +29,7 @@ namespace TestContextMapperExtension
         Enum,
         NullableEnum,
         IList,
+        IEnumerable,
         NullableIEnumerable,
         IDictionary,
         UnusableProperty

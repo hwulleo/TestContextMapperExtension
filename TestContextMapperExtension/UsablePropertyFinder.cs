@@ -124,6 +124,14 @@ namespace TestContextMapperExtension
                 return UsablePropertyType.IList;
             }
 
+            if (propertyType.IsGenericType
+            && propertyType.GetGenericTypeDefinition().GetInterfaces().Any(i => i.Name.Contains("IEnumerable"))
+            && propertyType.GetGenericTypeDefinition().GetInterfaces().Count() == 1
+            && propertyType.GetGenericArguments().All(t => IsSimpleProperty(t)))
+            {
+                return UsablePropertyType.IEnumerable;
+            }
+
             return UsablePropertyType.UnusableProperty;
         }
 
